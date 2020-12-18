@@ -1,0 +1,7 @@
+bicep build ./main.bicep
+
+az deployment group  create -f ./main.json -g dnstest --name 'dnsaadds' --confirm-with-what-if
+ 
+
+
+#az deployment list --output table --query '[].[name]'
