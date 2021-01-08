@@ -1,0 +1,1 @@
+New-AzPolicyDefinition -Name 'DNSzone-blob' -ManagementGroupName ES -DisplayName 'Add Private Endpoint FQDN - Storage Blob' -Metadata '{"category":"evtest"}' -Policy './Policies/DNSzone-blob.json'  
