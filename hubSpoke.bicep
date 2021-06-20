@@ -69,45 +69,6 @@ module spokeProxyVNET 'Modules/vnet.bicep' = {
   }
 }
 
-module HubToSpokePeering 'modules/peering.bicep' = {
-  name: 'hub-to-spoke-peering'
-  scope: resourceGroup(hubrg.name)
-  params: {
-    localVnetName: hubVNET.outputs.name
-    remoteVnetName: 'spoke'
-    remoteVnetId: spokeVNET.outputs.id
-  }
-}
-
-module SpokeToHubPeering 'modules/peering.bicep' = {
-  name: 'spoke-to-hub-peering'
-  scope: resourceGroup(spokerg.name)
-  params: {
-    localVnetName: spokeVNET.outputs.name
-    remoteVnetName: 'hub'
-    remoteVnetId: hubVNET.outputs.id
-  }
-}
-
-module HubToSpokeProxyPeering 'modules/peering.bicep' = {
-  name: 'hub-to-spokeProxy-peering'
-  scope: resourceGroup(hubrg.name)
-  params: {
-    localVnetName: hubVNET.outputs.name
-    remoteVnetName: 'proxy'
-    remoteVnetId: spokeProxyVNET.outputs.id
-  }
-}
-
-module SpokeProxyToHubPeering 'modules/peering.bicep' = {
-  name: 'spokeProxy-to-hub-peering'
-  scope: resourceGroup(spokerg.name)
-  params: {
-    localVnetName: spokeProxyVNET.outputs.name
-    remoteVnetName: 'hub'
-    remoteVnetId: hubVNET.outputs.id
-  }
-}
 
 module hubfirewall 'Modules/fw.bicep' ={
   name: 'hubFirewall'
