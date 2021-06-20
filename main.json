@@ -1,6 +1,13 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.255.40792",
+      "templateHash": "8353038408887853796"
+    }
+  },
   "functions": [],
   "resources": [
     {
@@ -15,6 +22,13 @@
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.3.255.40792",
+              "templateHash": "14841056449664017670"
+            }
+          },
           "functions": [],
           "resources": [
             {
@@ -174,12 +188,19 @@
             "value": "westeurope"
           },
           "subnetId": {
-            "value": "[reference(extensionResourceId(resourceGroup().id, 'Microsoft.Resources/deployments', 'dnsvnet'), '2019-10-01').outputs.aaddssudnet.value]"
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'dnsvnet'), '2019-10-01').outputs.aaddssudnet.value]"
           }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.3.255.40792",
+              "templateHash": "10945083320644217387"
+            }
+          },
           "parameters": {
             "domainName": {
               "type": "string",
@@ -229,7 +250,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(resourceGroup().id, 'Microsoft.Resources/deployments', 'dnsvnet')]"
+        "[resourceId('Microsoft.Resources/deployments', 'dnsvnet')]"
       ]
     }
   ]

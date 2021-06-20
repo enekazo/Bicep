@@ -2,6 +2,10 @@ bicep build ./main.bicep
 
 az deployment group  create -f ./main.json -g dnstest --name 'dnsaadds' --confirm-with-what-if
  
+az deployment sub create  -f ./hubSpoke.bicep --location westeurope --confirm-with-what-if -name hubspoke
 
+az deployment sub delete -n hubSpoke
+
+az bicep upgrade
 
 #az deployment list --output table --query '[].[name]'

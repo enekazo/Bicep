@@ -38,13 +38,31 @@ module spokeVNET 'Modules/vnet.bicep' = {
     vnetname: 'spoke'
     addressSpaces: [
       '192.168.1.0/24'
-      '10.0.0.0/23'
     ]
     subnets: [
       {
         name: 'spoke-vnet'
         properties: {
-          addressPrefix: '10.0.0.0/24'
+          addressPrefix: '192.168.1.0/24'
+        }
+      }
+    ]
+  }
+}
+
+module spokeProxyVNET 'Modules/vnet.bicep' = {
+  name: 'spokeProxy'
+  scope: resourceGroup(spokerg.name)
+  params: {
+    vnetname: 'proxy'
+    addressSpaces: [
+      '192.168.2.0/24'
+    ]
+    subnets: [
+      {
+        name: 'proxy'
+        properties: {
+          addressPrefix: '192.168.2.0/24'
         }
       }
     ]
@@ -68,6 +86,48 @@ module SpokeToHubPeering 'modules/peering.bicep' = {
     localVnetName: spokeVNET.outputs.name
     remoteVnetName: 'hub'
     remoteVnetId: hubVNET.outputs.id
+  }
+}
+
+module HubToSpokeProxyPeering 'modules/peering.bicep' = {
+  name: 'hub-to-spokeProxy-peering'
+  scope: resourceGroup(hubrg.name)
+  params: {
+    localVnetName: hubVNET.outputs.name
+    remoteVnetName: 'proxy'
+    remoteVnetId: spokeProxyVNET.outputs.id
+  }
+}
+
+module SpokeProxyToHubPeering 'modules/peering.bicep' = {
+  name: 'spokeProxy-to-hub-peering'
+  scope: resourceGroup(spokerg.name)
+  params: {
+    localVnetName: spokeProxyVNET.outputs.name
+    remoteVnetName: 'hub'
+    remoteVnetId: hubVNET.outputs.id
+  }
+}
+
+module hubfirewall 'Modules/fw.bicep' ={
+  name: 'hubFirewall'
+  scope: resourceGroup(hubrg.name)
+  params: {
+    subnetID:hubVNET.outputs.subnetids[0].id
+    firewallName:'hubFirewall'
+  }
+
+}
+
+module proxyVM 'Modules/VmUbuntu.bicep'={
+  name: 'proxyvm'
+  scope: resourceGroup(spokerg.name)
+  params:{
+    adminPasswordOrKey:'!Pass@word1234'
+    adminUsername:'evadmin'
+    dnsLabelPrefix:'evproxyvm'
+    subnetID:spokeProxyVNET.outputs.subnetids[0].id
+    deployVMExt: true
   }
 }
 

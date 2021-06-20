@@ -15,7 +15,8 @@
 		"msazurermtools.azurerm-vscode-tools",
 		"ms-vscode.azure-account",
 		"ms-vscode.vscode-node-azure-pack",
-		"azurepolicy.azurepolicyextension"
+		"azurepolicy.azurepolicyextension",
+		"bencoleman.armview"
 	],
 
 	"mounts": [
