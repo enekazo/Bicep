@@ -31,4 +31,4 @@ stages:
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                az deployment sub create  -f  hubSpoke.bicep --location westeurope
+                az deployment sub create  -f  $(System.DefaultWorkingDirectory)/hubSpoke.bicep --location westeurope
