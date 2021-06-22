@@ -31,4 +31,4 @@ stages:
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                az deployment sub create  -f  hubSpoke.bicep --location westeurope  -name hubspoke
+                az deployment sub create  -f  hubSpoke.bicep --location westeurope
