@@ -1,5 +1,5 @@
 
-param extname string 
+param vmName string 
 param location string = resourceGroup().location
 param script string  = 'apt install squid'
 
@@ -7,7 +7,7 @@ param script string  = 'apt install squid'
 
 
 resource vmext 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  name: extname
+  name: '${vmName}/squid-app'
   location: location
   properties: {
     publisher: 'Microsoft.Azure.Extensions'
@@ -21,3 +21,4 @@ resource vmext 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
     protectedSettings: {}
   }
 }
+

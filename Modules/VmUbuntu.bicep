@@ -158,20 +158,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
 }
 
 
-resource vmext 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = if (deployVMExt) {
-  name: '${vm.name}/config-app'
-  location: location
-  properties: {
-    publisher: 'Microsoft.Azure.Extensions'
-    type: 'CustomScript'
-    typeHandlerVersion: '2.0'
-    autoUpgradeMinorVersion: true
-    settings: {
-      commandToExecute: script
-    }
-  }
-}
 
+output VmName string = vm.name
 output adminUsername string = adminUsername
 output hostname string = publicIP.properties.dnsSettings.fqdn
 output sshCommand string = 'ssh ${adminUsername}@${publicIP.properties.dnsSettings.fqdn}'
