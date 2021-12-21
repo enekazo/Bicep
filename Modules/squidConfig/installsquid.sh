@@ -9,5 +9,5 @@ echo "install squid using yum -y install squid"
 #systemctl restart firewalld
 # iptables -t filter --list
 
-sudo apt update
+#sudo apt update
 sudo apt install squid
