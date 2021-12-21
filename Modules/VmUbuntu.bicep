@@ -160,6 +160,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
 
 
 output VmName string = vm.name
-output adminUsername string = adminUsername
-output hostname string = publicIP.properties.dnsSettings.fqdn
-output sshCommand string = 'ssh ${adminUsername}@${publicIP.properties.dnsSettings.fqdn}'
+//output adminUsername string = adminUsername
+//output hostname string = publicIP.properties.dnsSettings.fqdn
+//output sshCommand string = 'ssh ${adminUsername}@${publicIP.properties.dnsSettings.fqdn}'

@@ -15,3 +15,6 @@ az bicep upgrade
 az deployment group  create -f Deployments/multipleVMs.bicep  -g hubtestrg --name 'multipleVMs' 
 bicep build Deployments/multipleVMs.bicep
  --confirm-with-what-if
+
+
+ 

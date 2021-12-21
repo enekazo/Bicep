@@ -1,0 +1,268 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.613.9944",
+      "templateHash": "6701691466750840362"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "copy": {
+        "name": "vdiWind",
+        "count": "[length(range(0, 2))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "[format('{0}vdiwinev', range(0, 2)[copyIndex()])]",
+      "resourceGroup": "hubtestrg",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "vmName": {
+            "value": "[format('{0}simple-vm', range(0, 2)[copyIndex()])]"
+          },
+          "nicName": {
+            "value": "[format('{0}myVMNic', range(0, 2)[copyIndex()])]"
+          },
+          "adminPassword": {
+            "value": "!Pass@word1234"
+          },
+          "adminUsername": {
+            "value": "evadmin"
+          },
+          "subnetID": {
+            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, 'hubtestrg'), 'Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}', 'hub', 'Other'), '/')[0], split(format('{0}/{1}', 'hub', 'Other'), '/')[1])]"
+          },
+          "customScript": {
+            "value": true
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.613.9944",
+              "templateHash": "4677545760907707281"
+            }
+          },
+          "parameters": {
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Username for the Virtual Machine."
+              }
+            },
+            "adminPassword": {
+              "type": "secureString",
+              "minLength": 12,
+              "metadata": {
+                "description": "Password for the Virtual Machine."
+              }
+            },
+            "OSVersion": {
+              "type": "string",
+              "defaultValue": "2019-Datacenter",
+              "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+              }
+            },
+            "vmName": {
+              "type": "string",
+              "defaultValue": "simple-vm",
+              "metadata": {
+                "description": "Name of the virtual machine."
+              }
+            },
+            "vmSize": {
+              "type": "string",
+              "defaultValue": "Standard_D2_v3",
+              "metadata": {
+                "description": "Size of the virtual machine."
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "subnetID": {
+              "type": "string",
+              "metadata": {
+                "description": "Nic Subnet ID."
+              }
+            },
+            "nicName": {
+              "type": "string",
+              "defaultValue": "myVMNic"
+            },
+            "joinAD": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "domainToJoin": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "domainUserName": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "domainPassword": {
+              "type": "secureString",
+              "defaultValue": ""
+            },
+            "ouPath": {
+              "type": "string",
+              "defaultValue": "none"
+            },
+            "domainJoinOptions": {
+              "type": "int",
+              "defaultValue": 3,
+              "metadata": {
+                "description": "Set of bit flags that define the join options. Default value of 3 is a combination of NETSETUP_JOIN_DOMAIN (0x00000001) & NETSETUP_ACCT_CREATE (0x00000002) i.e. will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx"
+              }
+            },
+            "customScript": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "virtualMachineExtensionCustomScriptUri": {
+              "type": "string",
+              "defaultValue": "https://raw.githubusercontent.com/Azure/bicep/main/docs/examples/201/vm-windows-with-custom-script-extension/install.ps1"
+            }
+          },
+          "functions": [],
+          "variables": {
+            "virtualMachineExtensionCustomScript": {
+              "name": "[format('{0}/config-app', parameters('vmName'))]",
+              "location": "[parameters('location')]",
+              "fileUris": [
+                "[parameters('virtualMachineExtensionCustomScriptUri')]"
+              ],
+              "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File ./{0}', last(split(parameters('virtualMachineExtensionCustomScriptUri'), '/')))]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2021-02-01",
+              "name": "[parameters('nicName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[parameters('subnetID')]"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "MicrosoftWindowsServer",
+                    "offer": "WindowsServer",
+                    "sku": "[parameters('OSVersion')]",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('nicName'))]"
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('nicName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('joinAD')]",
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/joindomain', parameters('vmName'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "JsonADDomainExtension",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "name": "[parameters('domainToJoin')]",
+                  "ouPath": "[parameters('ouPath')]",
+                  "user": "[format('{0}\\{1}', parameters('domainToJoin'), parameters('domainUserName'))]",
+                  "restart": true,
+                  "options": "[parameters('domainJoinOptions')]"
+                },
+                "protectedSettings": {
+                  "password": "[parameters('domainPassword')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('customScript')]",
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2020-06-01",
+              "name": "[variables('virtualMachineExtensionCustomScript').name]",
+              "location": "[variables('virtualMachineExtensionCustomScript').location]",
+              "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": "[variables('virtualMachineExtensionCustomScript').fileUris]",
+                  "commandToExecute": "[variables('virtualMachineExtensionCustomScript').commandToExecute]"
+                },
+                "protectedSettings": {}
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
