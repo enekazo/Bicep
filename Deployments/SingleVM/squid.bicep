@@ -52,6 +52,6 @@ module proxyVMExtInstall '../../Modules/extension.bicep' = {
   params:{
     vmName:proxyVM.outputs.VmName
     filesurls: filesurls
-    script:'sudo apt-get install squid'
+    script:'sh installsquid.sh'
   }  
 }
