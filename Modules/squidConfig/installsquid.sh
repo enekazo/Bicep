@@ -15,12 +15,12 @@ sudo apt install squid -y
 #sudo apt-get update
 #sudo apt-get install squid
 
-#sudo systemctl stop squid
+sudo systemctl stop squid
 
 #echo "Copy squid.conf file to /etc/squid/squid.conf"
-#\cp squid.conf /etc/squid/squid.conf
+\cp squid.conf /etc/squid/squid.conf
 
 #echo "Copy *.txt file to /etc/squid/"
-#\cp *.txt /etc/squid
+\cp *.txt /etc/squid
 
-#systemctl start squid
+systemctl start squid
