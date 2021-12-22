@@ -7,6 +7,7 @@ param spokeProxyVNETSub0IPRange  string = '192.168.0.0/24'
 param filesurls array =[
   'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/installsquid.sh'
   'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/whitelist.txt'
+  'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/squid.conf'
 ]
 
 resource spokerg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
