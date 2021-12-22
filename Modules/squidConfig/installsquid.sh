@@ -10,7 +10,7 @@ echo "install squid using yum -y install squid"
 # iptables -t filter --list
 
 sudo apt-get update
-sudo apt-get install squid
+#sudo apt-get install squid
 
 #sudo systemctl stop squid
 
