@@ -2,7 +2,7 @@ bicep build main.bicep
 
 az deployment group  create -f ./main.json -g dnstest --name 'dnsaadds' --confirm-with-what-if
  
-az deployment sub create  -f  KK-Network.bicep  --location westeurope --confirm-with-what-if --name KK-Network
+az deployment sub create  -f  Deployments/KK-Network/KK-Network.bicep  --location westeurope  --name KK-Network
 
 az deployment sub delete -n hubSpoke
 
