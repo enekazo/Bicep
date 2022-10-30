@@ -80,7 +80,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2020-06-01' = {
   }
 }
 
-resource nsg 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
+resource nsg 'Microsoft.Network/networkSecurityGroups@2020-06-01' = if(deployVMExt) {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -104,7 +104,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
 
 
 
-resource publicIP 'Microsoft.Network/publicIPAddresses@2020-06-01' = {
+resource publicIP 'Microsoft.Network/publicIPAddresses@2020-06-01' = if(deployVMExt) {
   name: publicIPAddressName
   location: location
   sku: {

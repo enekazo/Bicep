@@ -2,7 +2,10 @@ targetScope = 'subscription'
 
 param region string = 'westeurope'
 param hubVnetIPRange  string = '192.168.0.0/24'
-param hubVnetSub0IPRange  string = '192.168.0.0/25'
+param hubVnetSubFWIPRange  string = '192.168.0.0/26'
+param hubVnetSubOtherIPRange  string = '192.168.0.64/26'
+param hubVnetSubProxyIPRange  string = '192.168.0.128/26'
+param hubVnetSubAgentsIPRange  string = '192.168.0.128/26'
 param spokeVNETIPRange  string = '192.168.1.0/24'
 param spokeVNETSub0IPRange  string = '192.168.1.0/24'
 param spokeProxyVNETIPRange  string = '192.168.2.0/24'
@@ -21,6 +24,7 @@ module hubVNET '../../Modules/vnet.bicep' = {
   name: 'hub-vnet'
   scope: resourceGroup(hubrg.name)
   params: {
+    location:region
     vnetname: 'hub'
     addressSpaces: [
       hubVnetIPRange
@@ -29,7 +33,25 @@ module hubVNET '../../Modules/vnet.bicep' = {
       {
         name: 'AzureFirewallSubnet'
         properties: {
-          addressPrefix: hubVnetSub0IPRange
+          addressPrefix: hubVnetSubFWIPRange
+        }
+      }
+      {
+        name: 'Proxy'
+        properties: {
+          addressPrefix: hubVnetSubProxyIPRange
+        }
+      }
+      {
+        name: 'Agents'
+        properties: {
+          addressPrefix: hubVnetSubAgentsIPRange
+        }
+      }
+      {
+        name: 'Other'
+        properties: {
+          addressPrefix: hubVnetSubOtherIPRange
         }
       }
     ]
@@ -40,6 +62,7 @@ module spokeVNET '../../Modules/vnet.bicep' = {
   name: 'spoke-vnet'
   scope: resourceGroup(spokerg.name)
   params: {
+    location:region
     vnetname: 'spoke'
     addressSpaces: [
       spokeVNETIPRange
@@ -55,10 +78,11 @@ module spokeVNET '../../Modules/vnet.bicep' = {
   }
 }
 
-module spokeProxyVNET '../../Modules/vnet.bicep' = {
+/*module spokeProxyVNET '../../Modules/vnet.bicep' = {
   name: 'spokeProxy'
   scope: resourceGroup(spokerg.name)
   params: {
+    location:region
     vnetname: 'proxy'
     addressSpaces: [
       spokeProxyVNETIPRange
@@ -73,7 +97,7 @@ module spokeProxyVNET '../../Modules/vnet.bicep' = {
     ]
   }
 }
-
+*/
 module HubToSpokePeering '../../modules/peering.bicep' = {
   name: 'hub-to-spoke-peering'
   scope: resourceGroup(hubrg.name)
@@ -93,7 +117,7 @@ module SpokeToHubPeering '../../modules/peering.bicep' = {
     remoteVnetId: hubVNET.outputs.id
   }
 }
-
+/*
 module HubToSpokeProxyPeering '../../modules/peering.bicep' = {
   name: 'hub-to-spokeProxy-peering'
   scope: resourceGroup(hubrg.name)
@@ -113,18 +137,31 @@ module SpokeProxyToHubPeering '../../modules/peering.bicep' = {
     remoteVnetId: hubVNET.outputs.id
   }
 }
+*/
+module ws '../../Modules/LogWS.bicep' ={
+  name: 'logsWS'
+  scope: resourceGroup(hubrg.name)
+  params:{
+    location:region
+    name: 'logsWS'
+  }
 
-/*module hubfirewall 'Modules/fw.bicep' ={
+}
+
+module hubfirewall '../../Modules/fwv2.bicep' ={
   name: 'hubFirewall'
   scope: resourceGroup(hubrg.name)
   params: {
-    subnetID:hubVNET.outputs.subnetids[0].id
-    firewallName:'hubFirewall'
+    vnet: hubVNET.outputs.id
+    location:region
+    afwSKU:'Standard'
+    logWI: ws.outputs.wsId
+    vnetName:'hub-vnet'
   }
 
-}*/
+}
 
-module proxyVM '../../Modules/VmUbuntu.bicep'={
+/*module proxyVM '../../Modules/VmUbuntu.bicep'={
   name: 'proxyvm'
   scope: resourceGroup(spokerg.name)
   params:{
@@ -136,13 +173,19 @@ module proxyVM '../../Modules/VmUbuntu.bicep'={
   }
 }
 
+param filesurls array =[
+  'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/installsquid.sh'
+  'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/whitelist.txt'
+  'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/squid.conf'
+]
+
 module proxyVMExtInstall '../../Modules/extension.bicep' = {
  scope:resourceGroup(spokerg.name)
   name: 'intallSquid'
   params:{
     vmName:proxyVM.outputs.VmName
-    filesurls:'https://raw.githubusercontent.com/enekazo/Bicep/main/Modules/squidConfig/installsquid.sh, https://github.com/enekazo/Bicep/blob/main/Modules/squidConfig/whitelist.txt'
+    filesurls: filesurls
     script:'sh installsquid.sh'
   }  
-}
+}*/
 

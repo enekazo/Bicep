@@ -7,10 +7,20 @@ param location string = resourceGroup().location
 param availabilityZones array = [
   '1'
 ]
-
+param numberOfPublicIPAddresses int = 1
 param subnetID string
 
 var azureFirewallSubnetName = 'AzureFirewallSubnet'
+
+var azureFirewallIpConfigurations = [for i in range(0, numberOfPublicIPAddresses): {
+  name: 'IpConf${i}'
+  properties: {
+    subnet: ((i == 0) ? json('{"id": "${subnetID}"}') : json('null'))
+    publicIPAddress: {
+      id: '${azureFirewallPublicIpId}${i + 1}'
+    }
+  }
+}]
 
 resource publicIP 'Microsoft.Network/publicIPAddresses@2020-06-01' = {
   name: 'publicIp1'
@@ -24,7 +34,30 @@ resource publicIP 'Microsoft.Network/publicIPAddresses@2020-06-01' = {
   }
 }
 
-resource firewall 'Microsoft.Network/azureFirewalls@2020-06-01' = {
+resource firewallPolicy 'Microsoft.Network/firewallPolicies@2022-01-01'= {
+  name: 'firewallPolicyName'
+  location: location
+  properties: {
+    threatIntelMode: 'Alert'
+  }
+}
+
+resource firewall 'Microsoft.Network/azureFirewalls@2021-03-01' = {
+  name: firewallName
+  location: location
+  zones: ((length(availabilityZones) == 0) ? null : availabilityZones)
+  dependsOn: [
+    publicIP
+  ]
+  properties: {
+    ipConfigurations: firewallPolicy
+    firewallPolicy: {
+      id: firewallPolicy.id
+    }
+  }
+}
+
+resource firewall2 'Microsoft.Network/azureFirewalls@2020-06-01' = {
   name: firewallName
   location: location
   zones: length(availabilityZones) == 0 ? json('null') : availabilityZones
