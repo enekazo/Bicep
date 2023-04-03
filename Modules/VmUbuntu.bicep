@@ -80,7 +80,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2020-06-01' = {
   }
 }
 
-resource nsg 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
+resource nsg 'Microsoft.Network/networkSecurityGroups@2020-06-01' = if(deployVMExt) {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -104,7 +104,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2020-06-01' = {
 
 
 
-resource publicIP 'Microsoft.Network/publicIPAddresses@2020-06-01' = {
+resource publicIP 'Microsoft.Network/publicIPAddresses@2020-06-01' = if(deployVMExt) {
   name: publicIPAddressName
   location: location
   sku: {
@@ -160,6 +160,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
 
 
 output VmName string = vm.name
-output adminUsername string = adminUsername
-output hostname string = publicIP.properties.dnsSettings.fqdn
-output sshCommand string = 'ssh ${adminUsername}@${publicIP.properties.dnsSettings.fqdn}'
+//output adminUsername string = adminUsername
+//output hostname string = publicIP.properties.dnsSettings.fqdn
+//output sshCommand string = 'ssh ${adminUsername}@${publicIP.properties.dnsSettings.fqdn}'

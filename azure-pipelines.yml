@@ -27,7 +27,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'deploy bicep template'
             inputs:
-              azureSubscription: 'MS MSDN Account(ca001e53-0237-4d8b-b28e-7e9be5757de4)' 
+              azureSubscription: '' 
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |

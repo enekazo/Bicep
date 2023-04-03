@@ -1,4 +1,4 @@
-{
+/*{
 	"name": "Bicep Authoring devcontainer",
 	"dockerFile": "Dockerfile",
 	"forwardPorts": [ 7071 ],
@@ -27,4 +27,39 @@
 		"type=volume,source=bicepazureclicreds,target=/root/.azure",
 	]
 
-}
+}*/
+{
+	"name": "Bicep Development Environment",
+	"dockerFile": "Dockerfile",
+	"runArgs": [
+	  "-v",
+	  "/var/run/docker.sock:/var/run/docker.sock"
+	],
+	"settings": {
+	  "terminal.integrated.profiles.linux": {
+		"bash": {
+		  "path": "/bin/bash"
+		}
+	  }
+	},
+	"extensions": [
+	  "msazurermtools.azurerm-vscode-tools",
+	  "ms-azuretools.vscode-bicep",
+	  "ms-dotnettools.csharp",
+	  "ms-azuretools.vscode-docker",
+	  "editorconfig.editorconfig",
+	  "github.copilot",
+	  "github.vscode-pull-request-github",
+	  "davidanson.vscode-markdownlint",
+	  "ms-vscode.powershell",
+	  "bencoleman.armview"
+	],
+	"features": {
+	  "github-cli": "latest",
+	  "azure-cli": "latest",
+	  "node": {
+		"version": "lts",
+		"nodeGypDependencies": true
+	  }
+	}
+  }
