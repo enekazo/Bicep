@@ -13,7 +13,7 @@ param OSVersion string = '2019-Datacenter'
 param vmName string = 'simple-vm'
 
 @description('Size of the virtual machine.')
-param vmSize string = 'Standard_D2_v3'
+param vmSize string = 'Standard_D2s_v3'
 
 @description('Location for all resources.')
 param location string = resourceGroup().location
@@ -35,7 +35,9 @@ param domainJoinOptions int = 3
 param customScript bool = false
 param virtualMachineExtensionCustomScriptUri string = 'https://raw.githubusercontent.com/Azure/bicep/main/docs/examples/201/vm-windows-with-custom-script-extension/install.ps1'
 
+param diskEncryptionSetID string
 
+param ImageID string
 resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   name: nicName
   location: location
@@ -74,14 +76,19 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     }
     storageProfile: {
       imageReference: {
-        id: 
+      //  id:ImageID
+        publisher: 'MicrosoftWindowsServer'
+        offer: 'WindowsServer'
+        sku: OSVersion
         version: 'latest'
-      }
+            }
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
           storageAccountType: 'StandardSSD_LRS'
-          diskEncryptionSet:
+          diskEncryptionSet: {
+            id:diskEncryptionSetID
+          }
         }
       }
     }
@@ -122,6 +129,27 @@ resource virtualMachineExtension 'Microsoft.Compute/virtualMachines/extensions@2
   }
 }
 
+resource virtualMachineExtensionDiagnostics 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+  name: '${vm.name}/${'Microsoft.Insight/setByPolicy'}'
+  location: location
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'diagnosticSettings'
+    typeHandlerVersion: '1.3'
+    autoUpgradeMinorVersion: true
+    settings: {
+      name: domainToJoin
+      ouPath: ouPath
+      user: '${domainToJoin}\\${domainUserName}'
+      restart: true
+      options: domainJoinOptions
+    }
+    protectedSettings: {
+      password: domainPassword
+    }
+  }
+}
+
 // Virtual Machine Extensions - Custom Script
 var virtualMachineExtensionCustomScript = {
   name: '${vm.name}/config-app'
@@ -145,8 +173,8 @@ resource vmext 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' =  if(c
       commandToExecute: virtualMachineExtensionCustomScript.commandToExecute
     }
     protectedSettings: {
-    //storageAccountName: ''
-    //storageAccountKey: ''
+     //storageAccountName: ''
+     //storageAccountKey: ''
     }
   }
 }

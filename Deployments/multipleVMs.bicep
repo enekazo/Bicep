@@ -6,6 +6,17 @@ resource vnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' exist
   scope:resourceGroup('hubtestrg')
 }
 
+resource DiskEncrySet 'Microsoft.Compute/diskEncryptionSets@2020-12-01' existing ={
+  name: 'evdiskencrytionset'
+  scope:resourceGroup('hubtestrg')
+}
+
+resource OsImage 'Microsoft.Compute/galleries/images@2020-09-30' existing ={
+  name: '${'evimageGalery'}/${'evimagedefinition'}'
+  scope:resourceGroup('hubtestrg')
+}
+
+
 /*module vdiVms '../Modules/VmUbuntu.bicep'= [for i in range(0, 2):{
   name: '${i}proxyvm'
   scope: resourceGroup('hubtestrg')
@@ -19,7 +30,7 @@ resource vnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' exist
   }
 }]*/
 
-module vdiWind  '../Modules/Windows.bicep' = [for i in range(0,2): {
+module vdiWind  '../Modules/Windows.bicep' = [for i in range(0,1): {
   name:'${i}vdiwinev'
   scope: resourceGroup('hubtestrg')
   params:{
@@ -28,6 +39,8 @@ module vdiWind  '../Modules/Windows.bicep' = [for i in range(0,2): {
     adminPassword:'!Pass@word1234'
     adminUsername:'evadmin'
     subnetID:vnetSubnet.id
-    customScript: true
+    customScript: false
+    diskEncryptionSetID: DiskEncrySet.id
+    ImageID: OsImage.id
   }
 }]
